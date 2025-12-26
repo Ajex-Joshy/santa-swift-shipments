@@ -30,12 +30,15 @@ const Index = () => {
   const [seeding, setSeeding] = useState(false);
   const [seeded, setSeeded] = useState(false);
 
-  // Seed initial data if empty
+  // Seed initial data if empty - only run once
   useEffect(() => {
+    let isMounted = true;
+    
     async function seedData() {
       if (cities.length > 0 || seeding || seeded) return;
       
       setSeeding(true);
+      setSeeded(true); // Prevent re-runs immediately
       console.log('Seeding initial city data...');
 
       try {
@@ -49,7 +52,7 @@ const Index = () => {
           timezone: city.tz,
           timezone_offset: city.offset,
           priority_score: Math.max(10, 100 - index),
-          gift_count: Math.floor(city.pop * 0.3) // ~30% of population
+          gift_count: Math.floor(city.pop * 0.3)
         }));
 
         const { data: insertedCities, error: citiesError } = await supabase
@@ -59,6 +62,7 @@ const Index = () => {
 
         if (citiesError) {
           console.error('Error inserting cities:', citiesError);
+          if (isMounted) setSeeding(false);
           return;
         }
 
@@ -72,74 +76,54 @@ const Index = () => {
             gifts_delivered: index < 3 ? city.gift_count : 0
           }));
 
-          const { error: deliveriesError } = await supabase
-            .from('deliveries')
-            .insert(deliveryData);
-
-          if (deliveriesError) {
-            console.error('Error inserting deliveries:', deliveriesError);
-          }
+          await supabase.from('deliveries').insert(deliveryData);
         }
 
         // Create mission stats
         const totalGifts = cityData.reduce((sum, c) => sum + c.gift_count, 0);
-        const { error: statsError } = await supabase
-          .from('mission_stats')
-          .insert({
-            total_gifts: totalGifts,
-            gifts_delivered: Math.floor(totalGifts * 0.05),
-            cities_visited: 3,
-            total_cities: cityData.length,
-            distance_traveled_km: 12500,
-            current_status: 'in_flight',
-            mission_start: new Date().toISOString()
-          });
-
-        if (statsError) {
-          console.error('Error inserting mission stats:', statsError);
-        }
+        await supabase.from('mission_stats').insert({
+          total_gifts: totalGifts,
+          gifts_delivered: Math.floor(totalGifts * 0.05),
+          cities_visited: 3,
+          total_cities: cityData.length,
+          distance_traveled_km: 12500,
+          current_status: 'in_flight',
+          mission_start: new Date().toISOString()
+        });
 
         // Insert initial telemetry
-        const { error: telemetryError } = await supabase
-          .from('sleigh_telemetry')
-          .insert({
-            latitude: 35.6762,
-            longitude: 139.6503,
-            altitude_meters: 10500,
-            speed_kmh: 7500,
-            heading_degrees: 270,
-            reindeer_fatigue_percent: 15,
-            cargo_weight_kg: 450000
-          });
-
-        if (telemetryError) {
-          console.error('Error inserting telemetry:', telemetryError);
-        }
+        await supabase.from('sleigh_telemetry').insert({
+          latitude: 35.6762,
+          longitude: 139.6503,
+          altitude_meters: 10500,
+          speed_kmh: 7500,
+          heading_degrees: 270,
+          reindeer_fatigue_percent: 15,
+          cargo_weight_kg: 450000
+        });
 
         // Add some weather conditions
-        const weatherData = [
+        await supabase.from('weather_conditions').insert([
           { region: 'North Atlantic', condition: 'wind', severity: 2, wind_speed_kmh: 85, visibility_km: 15, speed_reduction_percent: 10 },
           { region: 'Siberia', condition: 'blizzard', severity: 4, wind_speed_kmh: 120, visibility_km: 2, speed_reduction_percent: 40 }
-        ];
-
-        await supabase.from('weather_conditions').insert(weatherData);
+        ]);
 
         console.log('Seeding complete!');
-        setSeeded(true);
         
-        // Refresh data
-        window.location.reload();
+        // Refresh data after short delay
+        setTimeout(() => window.location.reload(), 500);
       } catch (err) {
         console.error('Seeding error:', err);
-      } finally {
-        setSeeding(false);
+        if (isMounted) setSeeding(false);
       }
     }
 
-    if (!loading && cities.length === 0) {
+    if (!loading && cities.length === 0 && !seeded) {
       seedData();
     }
-  }, [cities.length, loading, seeding, seeded]);
+    
+    return () => { isMounted = false; };
+  }, [cities.length, loading, seeded]);
 
   // Get current and next city names
   const currentCityName = telemetry?.current_city_id 
