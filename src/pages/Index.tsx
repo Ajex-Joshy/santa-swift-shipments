@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import GlobalMap from '@/components/map/GlobalMap';
 import MissionHeader from '@/components/dashboard/MissionHeader';
