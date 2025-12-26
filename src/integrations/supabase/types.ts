@@ -14,7 +14,310 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cities: {
+        Row: {
+          country: string
+          created_at: string
+          gift_count: number
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          population: number
+          priority_score: number
+          timezone: string
+          timezone_offset: number
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          gift_count?: number
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          population?: number
+          priority_score?: number
+          timezone: string
+          timezone_offset?: number
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          gift_count?: number
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          population?: number
+          priority_score?: number
+          timezone?: string
+          timezone_offset?: number
+        }
+        Relationships: []
+      }
+      deliveries: {
+        Row: {
+          city_id: string
+          completed_at: string | null
+          created_at: string
+          delay_reason: string | null
+          gifts_delivered: number
+          id: string
+          scheduled_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          city_id: string
+          completed_at?: string | null
+          created_at?: string
+          delay_reason?: string | null
+          gifts_delivered?: number
+          id?: string
+          scheduled_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          city_id?: string
+          completed_at?: string | null
+          created_at?: string
+          delay_reason?: string | null
+          gifts_delivered?: number
+          id?: string
+          scheduled_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergencies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_resolved: boolean
+          latitude: number | null
+          longitude: number | null
+          resolved_at: string | null
+          severity: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_resolved?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          resolved_at?: string | null
+          severity: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_resolved?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          resolved_at?: string | null
+          severity?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      mission_stats: {
+        Row: {
+          cities_visited: number
+          current_status: string
+          distance_traveled_km: number
+          gifts_delivered: number
+          id: string
+          mission_end: string | null
+          mission_start: string | null
+          total_cities: number
+          total_gifts: number
+          updated_at: string
+        }
+        Insert: {
+          cities_visited?: number
+          current_status?: string
+          distance_traveled_km?: number
+          gifts_delivered?: number
+          id?: string
+          mission_end?: string | null
+          mission_start?: string | null
+          total_cities?: number
+          total_gifts?: number
+          updated_at?: string
+        }
+        Update: {
+          cities_visited?: number
+          current_status?: string
+          distance_traveled_km?: number
+          gifts_delivered?: number
+          id?: string
+          mission_end?: string | null
+          mission_start?: string | null
+          total_cities?: number
+          total_gifts?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      routes: {
+        Row: {
+          city_sequence: string[]
+          created_at: string
+          estimated_duration_minutes: number
+          id: string
+          is_active: boolean
+          name: string
+          total_distance_km: number
+          updated_at: string
+        }
+        Insert: {
+          city_sequence?: string[]
+          created_at?: string
+          estimated_duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          total_distance_km?: number
+          updated_at?: string
+        }
+        Update: {
+          city_sequence?: string[]
+          created_at?: string
+          estimated_duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          total_distance_km?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sleigh_telemetry: {
+        Row: {
+          altitude_meters: number
+          cargo_weight_kg: number
+          current_city_id: string | null
+          heading_degrees: number
+          id: string
+          latitude: number
+          longitude: number
+          next_city_id: string | null
+          recorded_at: string
+          reindeer_fatigue_percent: number
+          speed_kmh: number
+        }
+        Insert: {
+          altitude_meters?: number
+          cargo_weight_kg?: number
+          current_city_id?: string | null
+          heading_degrees?: number
+          id?: string
+          latitude: number
+          longitude: number
+          next_city_id?: string | null
+          recorded_at?: string
+          reindeer_fatigue_percent?: number
+          speed_kmh?: number
+        }
+        Update: {
+          altitude_meters?: number
+          cargo_weight_kg?: number
+          current_city_id?: string | null
+          heading_degrees?: number
+          id?: string
+          latitude?: number
+          longitude?: number
+          next_city_id?: string | null
+          recorded_at?: string
+          reindeer_fatigue_percent?: number
+          speed_kmh?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sleigh_telemetry_current_city_id_fkey"
+            columns: ["current_city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sleigh_telemetry_next_city_id_fkey"
+            columns: ["next_city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weather_conditions: {
+        Row: {
+          city_id: string | null
+          condition: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          region: string | null
+          severity: number
+          speed_reduction_percent: number
+          visibility_km: number
+          wind_speed_kmh: number
+        }
+        Insert: {
+          city_id?: string | null
+          condition: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          region?: string | null
+          severity?: number
+          speed_reduction_percent?: number
+          visibility_km?: number
+          wind_speed_kmh?: number
+        }
+        Update: {
+          city_id?: string | null
+          condition?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          region?: string | null
+          severity?: number
+          speed_reduction_percent?: number
+          visibility_km?: number
+          wind_speed_kmh?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weather_conditions_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
