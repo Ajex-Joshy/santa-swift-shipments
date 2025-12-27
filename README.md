@@ -49,25 +49,6 @@ This project is built as a **portfolio-grade system**, emphasizing clean structu
 
 This stack ensures **performance, developer productivity, and long-term scalability**.
 
----
-
-## 📁 Project Structure
-
-santa-swift-shipments/
-├── public/                     # Static assets (images, icons, etc.)
-├── src/
-│   ├── components/             # Reusable UI components
-│   ├── App.tsx                 # Root React component
-│   └── main.tsx                # Application entry point (Vite bootstrap)
-├── index.html                  # Main HTML file
-├── package.json                # Project dependencies & scripts
-├── tailwind.config.ts          # Tailwind CSS configuration
-├── tsconfig.json               # TypeScript configuration
-├── vite.config.ts              # Vite build & dev server config
-└── README.md                   # Project documentation
-
-
-The structure is intentionally simple and clean, making it easy to scale the application as features grow.
 
 ---
 
